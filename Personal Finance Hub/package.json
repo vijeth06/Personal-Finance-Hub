@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "node -v",
+    "vercel-build": "echo 'No build step needed for Node.js server'"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^7.0.0",
