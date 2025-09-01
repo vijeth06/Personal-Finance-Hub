@@ -138,28 +138,51 @@ async function connectToMongo() {
   }
   
   try {
+    console.log('Attempting to connect to MongoDB...');
+    
     await mongoose.connect(MONGODB_URI, {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000
+      serverSelectionTimeoutMS: 30000, // Increased from 5000ms
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000, // Added connection timeout
+      retryWrites: true,
+      w: 'majority'
     });
     
     mongooseConnected = true;
-    console.log('Connected to MongoDB (Atlas)');
+    console.log('✅ Successfully connected to MongoDB Atlas');
     
     // Handle connection events
     mongoose.connection.on('error', (err) => {
-      console.error('MongoDB connection error:', err);
+      console.error('❌ MongoDB connection error:', err);
     });
     
     mongoose.connection.on('disconnected', () => {
-      console.log('MongoDB disconnected');
+      console.log('⚠️ MongoDB disconnected');
       mongooseConnected = false;
     });
     
+    mongoose.connection.on('reconnected', () => {
+      console.log('🔄 MongoDB reconnected');
+      mongooseConnected = true;
+    });
+    
   } catch (err) {
-    console.error('MongoDB connection error:', err.message);
+    console.error('❌ Failed to connect to MongoDB:', {
+      error: err.message,
+      code: err.code,
+      name: err.name
+    });
     mongooseConnected = false;
+    
+    // Provide helpful troubleshooting information
+    console.log('\n🔧 Troubleshooting steps:');
+    console.log('1. Check if MongoDB Atlas cluster is running');
+    console.log('2. Verify network access (IP whitelist)');
+    console.log('3. Confirm database user credentials');
+    console.log('4. Check internet connectivity');
+    console.log('5. Verify MongoDB URI format\n');
+    
     throw err;
   }
 }

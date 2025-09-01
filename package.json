@@ -5,8 +5,7 @@
   "main": "Personal Finance Hub/server.js",
   "scripts": {
     "start": "cd \"Personal Finance Hub\" && node server.js",
-    "dev": "cd \"Personal Finance Hub\" && npm run dev",
-    "install": "cd \"Personal Finance Hub\" && npm install"
+    "dev": "cd \"Personal Finance Hub\" && npm run dev"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
