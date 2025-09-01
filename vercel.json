@@ -23,11 +23,6 @@
       "dest": "/Personal Finance Hub/server.js"
     }
   ],
-  "functions": {
-    "Personal Finance Hub/server.js": {
-      "maxDuration": 30
-    }
-  },
   "env": {
     "NODE_ENV": "production"
   }
