@@ -2,10 +2,10 @@
   "name": "personal-finance-hub",
   "version": "1.0.0",
   "description": "Personal Finance Management Application",
-  "main": "Personal Finance Hub/server.js",
+  "main": "Personal-Finance-Hub/server.js",
   "scripts": {
-    "start": "cd \"Personal Finance Hub\" && node server.js",
-    "dev": "cd \"Personal Finance Hub\" && npm run dev"
+    "start": "cd \"Personal-Finance-Hub\" && node server.js",
+    "dev": "cd \"Personal-Finance-Hub\" && npm run dev"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
