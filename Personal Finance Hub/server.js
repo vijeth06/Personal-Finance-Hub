@@ -44,9 +44,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
+
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 
 
@@ -108,6 +119,16 @@ app.use("/api/goals", goalRoutes);
 app.get(["/", "/login", "/signup"], (req, res, next) => {
   const file = req.path === '/signup' ? 'signup.html' : req.path === '/login' ? 'login.html' : 'index.html';
   res.sendFile(path.join(__dirname, file));
+});
+
+// Catch-all handler for undefined routes
+app.get('*', (req, res) => {
+  // If it's an API request, return JSON error
+  if (req.path.startsWith('/api/')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  // For all other requests, serve the main app
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 
