@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Quick Function Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #3730a3;
+        }
+        .result {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        .info { background: #dbeafe; color: #1e40af; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Quick Function Test</h1>
+    
+    <div class="test-section">
+        <h2>🔐 Setup Test User</h2>
+        <button onclick="setupTestUser()">Setup Test User</button>
+        <button onclick="checkAuth()">Check Authentication</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>💸 Test Expense Functions</h2>
+        <button onclick="testAddExpense()">Test Add Expense</button>
+        <button onclick="testLoadExpenses()">Test Load Expenses</button>
+        <button onclick="testRenderExpenses()">Test Render Expenses</button>
+        <div id="expense-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Test Dashboard Functions</h2>
+        <button onclick="testDashboard()">Test Dashboard Update</button>
+        <button onclick="testNotifications()">Test Notifications</button>
+        <div id="dashboard-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🎨 Test UI Functions</h2>
+        <button onclick="testTheme()">Test Theme Toggle</button>
+        <button onclick="testExport()">Test Export</button>
+        <div id="ui-result"></div>
+    </div>
+
+    <!-- Load the main script -->
+    <script src="script-fixed.js"></script>
+
+    <script>
+        function addResult(containerId, message, type = 'info') {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            container.appendChild(div);
+        }
+
+        function clearResults(containerId) {
+            document.getElementById(containerId).innerHTML = '';
+        }
+
+        
+        function setupTestUser() {
+            clearResults('auth-result');
+            try {
+                const testUser = {
+                    id: 'test-user-123',
+                    name: 'Test User',
+                    email: 'test@example.com'
+                };
+                
+                localStorage.setItem('user', JSON.stringify(testUser));
+                localStorage.setItem('token', 'test-token-123');
+                
+                addResult('auth-result', '✅ Test user created successfully', 'success');
+                addResult('auth-result', `User: ${testUser.name} (${testUser.email})`, 'info');
+                
+                
+                if (typeof initializeApp === 'function') {
+                    setTimeout(() => {
+                        initializeApp();
+                        addResult('auth-result', '✅ App reinitialized', 'success');
+                    }, 500);
+                }
+            } catch (error) {
+                addResult('auth-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkAuth() {
+            clearResults('auth-result');
+            try {
+                if (typeof getCurrentUser === 'function') {
+                    const user = getCurrentUser();
+                    if (user) {
+                        addResult('auth-result', '✅ Authentication working', 'success');
+                        addResult('auth-result', `Current user: ${user.name}`, 'info');
+                    } else {
+                        addResult('auth-result', '❌ No user found', 'error');
+                    }
+                } else {
+                    addResult('auth-result', '❌ getCurrentUser function not found', 'error');
+                }
+            } catch (error) {
+                addResult('auth-result', `❌ Auth error: ${error.message}`, 'error');
+            }
+        }
+
+        function testAddExpense() {
+            clearResults('expense-result');
+            try {
+                
+                const mockForm = document.createElement('form');
+                mockForm.id = 'expense-form-element';
+                mockForm.innerHTML = `
+                    <input type="text" id="expense-name" value="Test Expense" required>
+                    <input type="number" id="expense-amount" value="100" required>
+                    <select id="expense-category" required>
+                        <option value="Food" selected>Food</option>
+                    </select>
+                    <input type="month" id="expense-month" value="2024-01" required>
+                    <button type="submit">Add Expense</button>
+                `;
+                document.body.appendChild(mockForm);
+
+                if (typeof submitExpenseForm === 'function') {
+                    addResult('expense-result', '✅ submitExpenseForm function exists', 'success');
+                    
+                    
+                    submitExpenseForm();
+                    addResult('expense-result', '✅ Function called successfully', 'success');
+                } else {
+                    addResult('expense-result', '❌ submitExpenseForm function not found', 'error');
+                }
+
+                
+                setTimeout(() => {
+                    if (mockForm.parentNode) {
+                        mockForm.parentNode.removeChild(mockForm);
+                    }
+                }, 1000);
+            } catch (error) {
+                addResult('expense-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLoadExpenses() {
+            clearResults('expense-result');
+            try {
+                if (typeof loadExpenses === 'function') {
+                    addResult('expense-result', '✅ loadExpenses function exists', 'success');
+                    loadExpenses();
+                    addResult('expense-result', '✅ Function called successfully', 'success');
+                } else {
+                    addResult('expense-result', '❌ loadExpenses function not found', 'error');
+                }
+            } catch (error) {
+                addResult('expense-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testRenderExpenses() {
+            clearResults('expense-result');
+            try {
+                
+                const mockTable = document.createElement('tbody');
+                mockTable.id = 'expense-table-body';
+                document.body.appendChild(mockTable);
+
+                if (typeof renderExpenses === 'function') {
+                    addResult('expense-result', '✅ renderExpenses function exists', 'success');
+                    renderExpenses();
+                    addResult('expense-result', '✅ Function called successfully', 'success');
+                } else {
+                    addResult('expense-result', '❌ renderExpenses function not found', 'error');
+                }
+
+                
+                setTimeout(() => {
+                    if (mockTable.parentNode) {
+                        mockTable.parentNode.removeChild(mockTable);
+                    }
+                }, 1000);
+            } catch (error) {
+                addResult('expense-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testDashboard() {
+            clearResults('dashboard-result');
+            try {
+                
+                const mockElements = ['total-expense', 'avg-spend', 'highest-expense', 'savings'];
+                mockElements.forEach(id => {
+                    const el = document.createElement('div');
+                    el.id = id;
+                    el.textContent = '0';
+                    document.body.appendChild(el);
+                });
+
+                if (typeof updateDashboard === 'function') {
+                    addResult('dashboard-result', '✅ updateDashboard function exists', 'success');
+                    updateDashboard();
+                    addResult('dashboard-result', '✅ Function called successfully', 'success');
+                } else {
+                    addResult('dashboard-result', '❌ updateDashboard function not found', 'error');
+                }
+
+                
+                setTimeout(() => {
+                    mockElements.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el && el.parentNode) {
+                            el.parentNode.removeChild(el);
+                        }
+                    });
+                }, 1000);
+            } catch (error) {
+                addResult('dashboard-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testNotifications() {
+            clearResults('dashboard-result');
+            try {
+                if (typeof showNotification === 'function') {
+                    addResult('dashboard-result', '✅ showNotification function exists', 'success');
+                    showNotification('✅ Test notification working!');
+                    showNotification('❌ Test error notification', true);
+                    addResult('dashboard-result', '✅ Notifications displayed', 'success');
+                } else {
+                    addResult('dashboard-result', '❌ showNotification function not found', 'error');
+                }
+            } catch (error) {
+                addResult('dashboard-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testTheme() {
+            clearResults('ui-result');
+            try {
+                if (typeof toggleTheme === 'function') {
+                    addResult('ui-result', '✅ toggleTheme function exists', 'success');
+                    toggleTheme();
+                    addResult('ui-result', '✅ Theme toggled successfully', 'success');
+                } else {
+                    addResult('ui-result', '❌ toggleTheme function not found', 'error');
+                }
+            } catch (error) {
+                addResult('ui-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function testExport() {
+            clearResults('ui-result');
+            try {
+                if (typeof exportToCSV === 'function') {
+                    addResult('ui-result', '✅ exportToCSV function exists', 'success');
+                    
+                    addResult('ui-result', '✅ Function available (not called to avoid download)', 'info');
+                } else {
+                    addResult('ui-result', '❌ exportToCSV function not found', 'error');
+                }
+            } catch (error) {
+                addResult('ui-result', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                setupTestUser();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

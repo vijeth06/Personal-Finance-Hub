@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Personal Finance Hub</title>
+    
+    <!-- External Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Modern Auth Styles -->
+    <link rel="stylesheet" href="auth-modern.css">
+    <script defer src="auth.js"></script>
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="auth-container fade-in">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-wallet"></i> Personal Finance Hub</h1>
+                <p>Sign in to manage your finances smartly</p>
+            </div>
+            
+            <div id="error-message" class="alert alert-danger"></div>
+            <div id="success-message" class="alert alert-success"></div>
+            
+            <form class="auth-form" id="loginForm">
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        required 
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        required 
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                    >
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" id="rememberMe" class="form-check-input">
+                    <label for="rememberMe" class="form-check-label">
+                        Remember me for 30 days
+                    </label>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>or continue with</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-button" onclick="socialLogin('google')">
+                    <i class="fab fa-google"></i>
+                    Google
+                </button>
+                <button class="social-button" onclick="socialLogin('github')">
+                    <i class="fab fa-github"></i>
+                    GitHub
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p>Don't have an account?</p>
+                <a href="signup.html">Create your account</a>
+                <br><br>
+                <a href="#" onclick="forgotPassword()">Forgot your password?</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            const themeToggle = document.querySelector('.theme-toggle i');
+            themeToggle.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+            }
+        }
+
+        
+        function showAlert(message, type = 'danger') {
+            const alertElement = document.getElementById(type === 'danger' ? 'error-message' : 'success-message');
+            alertElement.textContent = message;
+            alertElement.classList.add('show');
+            
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 5000);
+        }
+
+        function hideAlerts() {
+            document.getElementById('error-message').classList.remove('show');
+            document.getElementById('success-message').classList.remove('show');
+        }
+
+        
+        function validateForm() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email) {
+                showAlert('Please enter your email address');
+                return false;
+            }
+
+            if (!isValidEmail(email)) {
+                showAlert('Please enter a valid email address');
+                return false;
+            }
+
+            if (!password) {
+                showAlert('Please enter your password');
+                return false;
+            }
+
+            if (password.length < 6) {
+                showAlert('Password must be at least 6 characters long');
+                return false;
+            }
+
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideAlerts();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const submitButton = document.querySelector('.auth-button');
+            const originalText = submitButton.innerHTML;
+            
+            
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing In...';
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+
+            try {
+                const formData = new FormData(this);
+                const loginData = {
+                    email: formData.get('email'),
+                    password: formData.get('password')
+                };
+
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    window.location.href = 'index.html';
+                } else {
+                    showAlert(data.error || data.message || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAlert('Network error. Please check your connection and try again.');
+            } finally {
+                
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+            }
+        });
+
+        
+        function socialLogin(provider) {
+            showAlert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} login coming soon!`, 'success');
+        }
+
+        
+        function forgotPassword() {
+            const email = document.getElementById('email').value.trim();
+            if (email && isValidEmail(email)) {
+                showAlert(`Password reset link will be sent to ${email}`, 'success');
+            } else {
+                showAlert('Please enter a valid email address first');
+            }
+        }
+
+        
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    this.parentElement.classList.add('has-value');
+                } else {
+                    this.parentElement.classList.remove('has-value');
+                }
+            });
+        });
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            
+            document.getElementById('email').focus();
+            
+            
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

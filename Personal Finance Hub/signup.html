@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Personal Finance Hub</title>
+    
+    <!-- External Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Modern Auth Styles -->
+    <link rel="stylesheet" href="auth-modern.css">
+    <script defer src="auth.js"></script>
+</head>
+
+<body class="signup-page">
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="auth-container fade-in">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1><i class="fas fa-wallet"></i> Personal Finance Hub</h1>
+                <p>Create your account to start managing your finances</p>
+            </div>
+            
+            <div id="error-message" class="alert alert-danger"></div>
+            <div id="success-message" class="alert alert-success"></div>
+            
+            <form class="auth-form" id="signupForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">
+                            <i class="fas fa-user"></i> First Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="firstName" 
+                            name="firstName" 
+                            class="form-input" 
+                            required 
+                            placeholder="John"
+                            autocomplete="given-name"
+                        >
+                        <div class="validation-message" id="firstName-message"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">
+                            <i class="fas fa-user"></i> Last Name
+                        </label>
+                        <input 
+                            type="text" 
+                            id="lastName" 
+                            name="lastName" 
+                            class="form-input" 
+                            required 
+                            placeholder="Doe"
+                            autocomplete="family-name"
+                        >
+                        <div class="validation-message" id="lastName-message"></div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="email" class="form-label">
+                        <i class="fas fa-envelope"></i> Email Address
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        required 
+                        placeholder="john.doe@example.com"
+                        autocomplete="email"
+                    >
+                    <div class="validation-message" id="email-message"></div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label for="password" class="form-label">
+                        <i class="fas fa-lock"></i> Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        required 
+                        placeholder="Create a strong password"
+                        autocomplete="new-password"
+                    >
+                    <div class="password-strength" id="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill"></div>
+                        </div>
+                        <div class="strength-text">Password strength: <span id="strength-label">Weak</span></div>
+                    </div>
+                    <div class="validation-message" id="password-message"></div>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="confirmPassword" class="form-label">
+                        <i class="fas fa-lock"></i> Confirm Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="confirmPassword" 
+                        name="confirmPassword" 
+                        class="form-input" 
+                        required 
+                        placeholder="Confirm your password"
+                        autocomplete="new-password"
+                    >
+                    <div class="validation-message" id="confirmPassword-message"></div>
+                </div>
+                
+                <div class="form-check">
+                    <input type="checkbox" id="agreeTerms" class="form-check-input" required>
+                    <label for="agreeTerms" class="form-check-label">
+                        I agree to the <a href="#" onclick="showTerms()">Terms of Service</a> and 
+                        <a href="#" onclick="showPrivacy()">Privacy Policy</a>
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" id="newsletter" class="form-check-input">
+                    <label for="newsletter" class="form-check-label">
+                        Send me tips and updates about personal finance management
+                    </label>
+                </div>
+                
+                <button type="submit" class="auth-button">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>or sign up with</span>
+            </div>
+
+            <div class="social-login">
+                <button class="social-button" onclick="socialSignup('google')">
+                    <i class="fab fa-google"></i>
+                    Google
+                </button>
+                <button class="social-button" onclick="socialSignup('github')">
+                    <i class="fab fa-github"></i>
+                    GitHub
+                </button>
+            </div>
+
+            <div class="auth-footer">
+                <p>Already have an account?</p>
+                <a href="login.html">Sign in to your account</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            
+            const themeToggle = document.querySelector('.theme-toggle i');
+            themeToggle.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.theme-toggle i').className = 'fas fa-sun';
+            }
+        }
+
+        
+        function showAlert(message, type = 'danger') {
+            const alertElement = document.getElementById(type === 'danger' ? 'error-message' : 'success-message');
+            alertElement.textContent = message;
+            alertElement.classList.add('show');
+            
+            setTimeout(() => {
+                alertElement.classList.remove('show');
+            }, 5000);
+        }
+
+        function hideAlerts() {
+            document.getElementById('error-message').classList.remove('show');
+            document.getElementById('success-message').classList.remove('show');
+        }
+
+        
+        function validateField(fieldId, validationFn, errorMessage) {
+            const field = document.getElementById(fieldId);
+            const message = document.getElementById(fieldId + '-message');
+            const isValid = validationFn(field.value);
+            
+            field.classList.toggle('valid', isValid);
+            field.classList.toggle('invalid', !isValid);
+            
+            if (!isValid && field.value) {
+                message.textContent = errorMessage;
+                message.className = 'validation-message error';
+            } else if (isValid) {
+                message.textContent = '✓ Looks good!';
+                message.className = 'validation-message success';
+            } else {
+                message.className = 'validation-message';
+            }
+            
+            return isValid;
+        }
+
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        function isValidName(name) {
+            return name.trim().length >= 2 && /^[a-zA-Z\s]+$/.test(name);
+        }
+
+        function isValidPassword(password) {
+            return password.length >= 8 && 
+                   /[A-Z]/.test(password) && 
+                   /[a-z]/.test(password) && 
+                   /[0-9]/.test(password);
+        }
+
+        function getPasswordStrength(password) {
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password)) score++;
+            if (/[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+            
+            return score;
+        }
+
+        function updatePasswordStrength(password) {
+            const strength = getPasswordStrength(password);
+            const strengthElement = document.getElementById('password-strength');
+            const strengthLabel = document.getElementById('strength-label');
+            
+            strengthElement.className = 'password-strength';
+            
+            if (strength <= 1) {
+                strengthElement.classList.add('strength-weak');
+                strengthLabel.textContent = 'Weak';
+            } else if (strength <= 2) {
+                strengthElement.classList.add('strength-fair');
+                strengthLabel.textContent = 'Fair';
+            } else if (strength <= 3) {
+                strengthElement.classList.add('strength-good');
+                strengthLabel.textContent = 'Good';
+            } else {
+                strengthElement.classList.add('strength-strong');
+                strengthLabel.textContent = 'Strong';
+            }
+        }
+
+        
+        function validateForm() {
+            const firstName = validateField('firstName', isValidName, 'First name must be at least 2 characters and contain only letters');
+            const lastName = validateField('lastName', isValidName, 'Last name must be at least 2 characters and contain only letters');
+            const email = validateField('email', isValidEmail, 'Please enter a valid email address');
+            const password = validateField('password', isValidPassword, 'Password must be at least 8 characters with uppercase, lowercase, and number');
+            
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordMatch = confirmPassword === document.getElementById('password').value;
+            validateField('confirmPassword', () => passwordMatch, 'Passwords do not match');
+            
+            const agreeTerms = document.getElementById('agreeTerms').checked;
+            if (!agreeTerms) {
+                showAlert('Please agree to the Terms of Service and Privacy Policy');
+                return false;
+            }
+            
+            return firstName && lastName && email && password && passwordMatch;
+        }
+
+        
+        document.getElementById('firstName').addEventListener('input', function() {
+            validateField('firstName', isValidName, 'First name must be at least 2 characters and contain only letters');
+        });
+
+        document.getElementById('lastName').addEventListener('input', function() {
+            validateField('lastName', isValidName, 'Last name must be at least 2 characters and contain only letters');
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            validateField('email', isValidEmail, 'Please enter a valid email address');
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            const password = this.value;
+            updatePasswordStrength(password);
+            validateField('password', isValidPassword, 'Password must be at least 8 characters with uppercase, lowercase, and number');
+            
+            
+            const confirmPassword = document.getElementById('confirmPassword');
+            if (confirmPassword.value) {
+                const passwordMatch = confirmPassword.value === password;
+                validateField('confirmPassword', () => passwordMatch, 'Passwords do not match');
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const passwordMatch = this.value === password;
+            validateField('confirmPassword', () => passwordMatch, 'Passwords do not match');
+        });
+
+        
+        document.getElementById('signupForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            hideAlerts();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const submitButton = document.querySelector('.auth-button');
+            const originalText = submitButton.innerHTML;
+            
+            
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+            submitButton.disabled = true;
+            submitButton.classList.add('loading');
+
+            try {
+                const formData = new FormData(this);
+                const signupData = {
+                    name: `${formData.get('firstName')} ${formData.get('lastName')}`,
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    newsletter: formData.get('newsletter') === 'on'
+                };
+
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(signupData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('Account created successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 800);
+                } else {
+                    showAlert(data.error || data.message || 'Registration failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAlert('Network error. Please check your connection and try again.');
+            } finally {
+                
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+            }
+        });
+
+        
+        function socialSignup(provider) {
+            showAlert(`${provider.charAt(0).toUpperCase() + provider.slice(1)} signup coming soon!`, 'success');
+        }
+
+        
+        function showTerms() {
+            showAlert('Terms of Service will be displayed here', 'success');
+        }
+
+        function showPrivacy() {
+            showAlert('Privacy Policy will be displayed here', 'success');
+        }
+
+        
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('focused');
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('focused');
+            });
+
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    this.parentElement.classList.add('has-value');
+                } else {
+                    this.parentElement.classList.remove('has-value');
+                }
+            });
+        });
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            
+            
+            document.getElementById('firstName').focus();
+            
+            
+            const token = localStorage.getItem('token');
+            if (token) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                document.getElementById('signupForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html>

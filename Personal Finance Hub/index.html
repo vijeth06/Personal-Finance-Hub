@@ -1,0 +1,1760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>💰 Personal Finance Hub</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+  
+  <script src="services/notificationService.js"></script>
+  <script src="services/categoryService.js"></script>
+  <script src="services/goalService.js"></script>
+  
+  <style>
+    :root {
+      
+      --primary: #6366f1;
+      --primary-light: #a5b4fc;
+      --primary-dark: #4338ca;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      
+     
+      --bg: var(--gray-50);
+      --surface: #ffffff;
+      --surface-2: var(--gray-100);
+      --text: var(--gray-900);
+      --text-muted: var(--gray-600);
+      --border: var(--gray-200);
+      --border-light: var(--gray-100);
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+      
+      
+      --space-1: 0.25rem;
+      --space-2: 0.5rem;
+      --space-3: 0.75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+      
+      
+      --radius-sm: 0.375rem;
+      --radius: 0.5rem;
+      --radius-md: 0.75rem;
+      --radius-lg: 1rem;
+      --radius-xl: 1.5rem;
+      --radius-2xl: 2rem;
+      
+      
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    
+    body.dark-mode {
+      --bg: var(--gray-900);
+      --surface: var(--gray-800);
+      --surface-2: var(--gray-700);
+      --text: var(--gray-100);
+      --text-muted: var(--gray-400);
+      --border: var(--gray-700);
+      --border-light: var(--gray-600);
+    }
+
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: var(--transition);
+      overflow-x: hidden;
+    }
+
+    
+    .modern-header {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: var(--space-4) 0;
+    }
+
+    body.dark-mode .modern-header {
+      background: rgba(30, 41, 59, 0.8);
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 var(--space-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-size: 1.75rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .user-info {
+      font-weight: 500;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    
+    .floating-nav {
+      position: fixed;
+      bottom: var(--space-6);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-3);
+      box-shadow: var(--shadow-xl);
+      z-index: 50;
+      display: flex;
+      gap: var(--space-2);
+    }
+
+    body.dark-mode .floating-nav {
+      background: rgba(30, 41, 59, 0.9);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 1.25rem;
+      position: relative;
+    }
+
+    .nav-item:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .nav-item.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    
+    .main-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: var(--space-8) var(--space-6);
+    }
+
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-lg);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark-mode .glass-card {
+      background: rgba(30, 41, 59, 0.7);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-xl);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-6);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    
+    .stat-card {
+      text-align: left;
+      padding: var(--space-8);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-2);
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.875rem;
+    }
+
+    
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .form-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .form-input, .form-select {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      font-size: 1rem;
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgb(99 102 241 / 0.1);
+    }
+
+    
+    .btn-modern {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-6);
+      border-radius: var(--radius-lg);
+      font-size: 1rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      background: var(--surface);
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-2);
+      transform: translateY(-2px);
+    }
+
+    
+    .chart-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-wrapper {
+      position: relative;
+      height: 400px;
+      margin-top: var(--space-4);
+    }
+
+    
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .modern-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .modern-table th {
+      background: var(--surface-2);
+      padding: var(--space-4);
+      font-weight: 600;
+      color: var(--text);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modern-table td {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modern-table tr:hover {
+      background: var(--surface-2);
+    }
+
+    
+    .notifications-container {
+      position: fixed;
+      top: var(--space-6);
+      right: var(--space-6);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .notification {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-lg);
+      min-width: 300px;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .notification.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .notification.error {
+      border-left: 4px solid var(--danger);
+    }
+
+    
+    .progress-indicator {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-xl);
+      z-index: 1000;
+      text-align: center;
+    }
+
+    body.dark-mode .progress-indicator {
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .progress-bar {
+      width: 200px;
+      height: 4px;
+      background: var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: var(--space-4);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: var(--radius);
+      animation: progress 2s ease-in-out infinite;
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    
+    @media (max-width: 768px) {
+      .main-container {
+        padding: var(--space-4);
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+      
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .floating-nav {
+        bottom: var(--space-4);
+        padding: var(--space-2);
+      }
+      
+      .nav-item {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+      }
+    }
+
+    
+    .theme-toggle {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: 0.875rem;
+      color: var(--text);
+    }
+
+    .theme-toggle:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .slide-up {
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .quick-action-btn {
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .quick-action-btn:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .action-icon {
+      font-size: 1.5rem;
+    }
+
+    
+    .insights-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .insight-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+    }
+
+    .insight-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .insight-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    
+    .cash-flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .cash-flow-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .summary-item:last-child {
+      border-bottom: none;
+    }
+
+    .summary-label {
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .summary-value {
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: var(--space-6);
+    }
+
+    .report-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      box-shadow: var(--shadow-md);
+    }
+
+    .report-card h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: var(--space-3);
+    }
+
+    .report-card p {
+      color: var(--text-muted);
+      margin-bottom: var(--space-4);
+    }
+
+    
+    .goals-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      box-shadow: var(--shadow-md);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .section-header h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0;
+    }
+
+    
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-8);
+      color: var(--text-muted);
+    }
+
+    
+    .filters {
+      display: flex;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+      flex-wrap: wrap;
+    }
+
+    .filters input,
+    .filters select {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      font-size: 0.875rem;
+      color: var(--text);
+      transition: var(--transition);
+    }
+
+    .filters input:focus,
+    .filters select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+    }
+
+    
+    .hero-section {
+      text-align: center;
+      padding: var(--space-12) 0;
+      margin-bottom: var(--space-8);
+      background: linear-gradient(135deg, 
+        rgba(99, 102, 241, 0.1), 
+        rgba(139, 92, 246, 0.1), 
+        rgba(236, 72, 153, 0.1)
+      );
+      border-radius: var(--radius-2xl);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-4);
+    }
+
+    .hero-emoji {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark-mode .glass-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .gradient-border {
+      position: relative;
+    }
+
+    .gradient-border::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+      border-radius: inherit;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: xor;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .gradient-border:hover::after {
+      opacity: 0.6;
+    }
+
+    .card-header-minimal {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-6);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-xl);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    }
+
+    .gradient-bg-alt {
+      background: linear-gradient(135deg, var(--secondary), var(--accent));
+    }
+
+    .gradient-bg-warning {
+      background: linear-gradient(135deg, var(--warning), #f97316);
+    }
+
+    .gradient-bg-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+    }
+
+    .card-trend {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+    }
+
+    .card-trend.positive {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .card-trend.warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .card-trend.neutral {
+      background: rgba(107, 114, 128, 0.1);
+      color: var(--text-muted);
+    }
+
+    .stat-content {
+      flex: 1;
+    }
+
+    .stat-value {
+      font-size: 2.75rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--text), var(--text));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-2);
+      line-height: 1;
+    }
+
+    .stat-label {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: var(--space-1);
+    }
+
+    .stat-description {
+      color: var(--text-muted);
+      font-weight: 400;
+      font-size: 0.875rem;
+    }
+
+    
+    .form-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      margin-bottom: var(--space-8);
+      box-shadow: var(--shadow-md);
+    }
+
+    .action-icon {
+      font-size: 1.5rem;
+    }
+
+    
+    .insights-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: var(--space-8);
+      margin-bottom: var(--space-12);
+    }
+
+    .insight-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(30px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: var(--radius-2xl);
+      padding: var(--space-8);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-height: 280px;
+    }
+
+    body.dark-mode .insight-card {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .insight-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    }
+
+    .insight-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .insight-card h3 {
+      font-size: 1.375rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: var(--space-6);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      position: relative;
+    }
+
+    .insight-card h3 i {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.125rem;
+    }
+
+    
+    .cash-flow-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: var(--space-6);
+    }
+
+    
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2rem;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      
+      .hero-emoji {
+        font-size: 2.5rem;
+      }
+      
+      .stat-card {
+        min-height: 160px;
+        padding: var(--space-6);
+      }
+      
+      .stat-value {
+        font-size: 2rem;
+      }
+      
+      .insights-dashboard {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+      }
+      
+      .insight-card {
+        min-height: 240px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <script>
+    
+    function checkAuth() {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (!token || !user) {
+        window.location.href = 'login.html';
+        return null;
+      }
+      return JSON.parse(user);
+    }
+
+    
+    checkAuth();
+  </script>
+
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-wallet"></i>
+        Personal Finance Hub
+      </div>
+      <div class="header-controls">
+        <span class="user-info">
+          <i class="fas fa-user-circle"></i>
+          Welcome, <span id="user-name"></span>!
+        </span>
+        <button type="button" id="toggle-theme" onclick="toggleTheme()" class="theme-toggle">
+          <i class="fas fa-moon"></i>
+          <span>Dark Mode</span>
+        </button>
+        <button type="button" id="logout-btn" onclick="logout()" class="btn-modern btn-secondary">
+          <i class="fas fa-sign-out-alt"></i>
+          Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    
+    <!-- Progress Indicator -->
+    <div id="progress-indicator" class="progress-indicator" style="display: none;">
+      <div class="progress-bar">
+        <div class="progress-fill"></div>
+      </div>
+      <span class="progress-text">Loading...</span>
+    </div>
+
+    <!-- Notifications Container -->
+    <div id="notifications" class="notifications-container"></div>
+
+    <!-- Hero Section -->
+    <section class="hero-section fade-in">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-emoji">💰</span>
+          Your Financial Overview
+        </h1>
+        <p class="hero-subtitle">Track, analyze, and optimize your personal finances</p>
+      </div>
+    </section>
+
+    <!-- Dashboard Overview -->
+    <section class="dashboard-grid fade-in">
+      <!-- Total Balance Card -->
+      <div class="glass-card stat-card gradient-border">
+        <div class="card-header-minimal">
+          <div class="card-icon gradient-bg">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="card-trend positive">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value" id="total-expense">₹0</div>
+          <div class="stat-label">Total Expenses</div>
+          <div class="stat-description">All time spending</div>
+        </div>
+      </div>
+
+      <!-- Monthly Average Card -->
+      <div class="glass-card stat-card gradient-border">
+        <div class="card-header-minimal">
+          <div class="card-icon gradient-bg-alt">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="card-trend neutral">
+            <i class="fas fa-minus"></i>
+          </div>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">₹<span id="avg-spend">0</span></div>
+          <div class="stat-label">Monthly Average</div>
+          <div class="stat-description">Average per month</div>
+        </div>
+      </div>
+
+      <!-- Highest Expense Card -->
+      <div class="glass-card stat-card gradient-border">
+        <div class="card-header-minimal">
+          <div class="card-icon gradient-bg-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div class="card-trend warning">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">₹<span id="highest-expense">0</span></div>
+          <div class="stat-label">Highest Expense</div>
+          <div class="stat-description">Single largest expense</div>
+        </div>
+      </div>
+
+      <!-- Savings Card -->
+      <div class="glass-card stat-card gradient-border">
+        <div class="card-header-minimal">
+          <div class="card-icon gradient-bg-success">
+            <i class="fas fa-piggy-bank"></i>
+          </div>
+          <div class="card-trend positive">
+            <i class="fas fa-arrow-up"></i>
+          </div>
+        </div>
+        <div class="stat-content">
+          <div class="stat-value">₹<span id="savings">0</span></div>
+          <div class="stat-label">Estimated Savings</div>
+          <div class="stat-description">Monthly surplus</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights Dashboard -->
+    <section id="insights-dashboard" class="insights-dashboard fade-in">
+      <div class="insight-card spending-trends">
+        <h3><i class="fas fa-chart-bar"></i> Monthly Overview</h3>
+        <div id="spending-trends-content"></div>
+      </div>
+
+      <div class="insight-card category-analysis">
+        <h3><i class="fas fa-bullseye"></i> Top Spending Categories</h3>
+        <div id="category-analysis-content"></div>
+      </div>
+
+      <div class="insight-card upcoming-expenses">
+        <h3><i class="fas fa-clock"></i> Upcoming Bills</h3>
+        <div id="upcoming-expenses-content"></div>
+      </div>
+      
+      <div class="insight-card savings-potential">
+        <h3><i class="fas fa-coins"></i> Budget Status</h3>
+        <div id="savings-potential-content"></div>
+      </div>
+      
+      <div class="insight-card expense-forecast">
+        <h3><i class="fas fa-crystal-ball"></i> Expense Forecast</h3>
+        <div id="expense-forecast-content"></div>
+      </div>
+      
+      <div class="insight-card quick-actions">
+        <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+        <div id="quick-actions-content" class="quick-actions-grid">
+          <button type="button" class="quick-action-btn add-expense-btn" onclick="scrollToExpenseForm()">
+            <span class="action-icon"><i class="fas fa-plus"></i></span>
+            <span>Add Expense</span>
+          </button>
+          <button type="button" class="quick-action-btn add-income-btn" onclick="smoothScrollTo('income-form')">
+            <span class="action-icon"><i class="fas fa-dollar-sign"></i></span>
+            <span>Add Income</span>
+          </button>
+          <button type="button" class="quick-action-btn export-btn" onclick="exportToCSV()">
+            <span class="action-icon"><i class="fas fa-download"></i></span>
+            <span>Export Data</span>
+          </button>
+          <button type="button" class="quick-action-btn chart-export-btn" onclick="exportChartAsImage('expense-chart', 'expense-chart.png')">
+            <span class="action-icon"><i class="fas fa-image"></i></span>
+            <span>Export Chart</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!-- Due Expenses Section -->
+    <section class="table-container slide-up">
+      <div style="padding: var(--space-6);">
+        <h2 class="section-title">
+          <i class="fas fa-exclamation-triangle"></i>
+          Due Expenses
+        </h2>
+        <div class="table-responsive">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Due Date</th>
+                <th>Days Until Due</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="due-expenses-table">
+              <!-- Due expenses will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Add Expense Section -->
+    <section id="expense-form" class="form-section slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-plus-circle"></i>
+        Add New Expense
+      </h2>
+      <form id="expense-form-element">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Expense Name</label>
+            <input type="text" id="expense-name" class="form-input" placeholder="Enter expense name" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" id="expense-amount" class="form-input" placeholder="0.00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="expense-category" class="form-select" required>
+              <option value="Rent">🏠 Rent</option>
+              <option value="Water">💧 Water</option>
+              <option value="Electricity">⚡ Electricity</option>
+              <option value="Internet">🌐 Internet</option>
+              <option value="Food">🍽️ Food</option>
+              <option value="Transportation">🚗 Transportation</option>
+              <option value="Healthcare">🏥 Healthcare</option>
+              <option value="Entertainment">🎬 Entertainment</option>
+              <option value="Shopping">🛍️ Shopping</option>
+              <option value="Emergency Fund">🚨 Emergency Fund</option>
+              <option value="Other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Month</label>
+            <input type="month" id="expense-month" class="form-input" required />
+          </div>
+        </div>
+        <button type="submit" class="btn-modern btn-primary" onclick="event.preventDefault(); submitExpenseForm();">
+          <i class="fas fa-plus"></i>
+          Add Expense
+        </button>
+      </form>
+
+      <!-- Recurring Expense Section -->
+      <div style="margin-top: var(--space-8);">
+        <h3 class="section-title">
+          <i class="fas fa-repeat"></i>
+          Add Recurring Expense
+        </h3>
+        <form id="recurring-expense-form">
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">Expense Name</label>
+              <input type="text" id="bill-name" class="form-input" placeholder="e.g., Rent, EB" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount (₹)</label>
+              <input type="number" id="bill-amount" class="form-input" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select id="bill-category" class="form-select" required>
+                <option value="Rent">🏠 Rent</option>
+                <option value="Water">💧 Water</option>
+                <option value="Electricity">⚡ Electricity</option>
+                <option value="Internet">🌐 Internet</option>
+                <option value="Food">🍽️ Food</option>
+                <option value="Transportation">🚗 Transportation</option>
+                <option value="Healthcare">🏥 Healthcare</option>
+                <option value="Entertainment">🎬 Entertainment</option>
+                <option value="Shopping">🛍️ Shopping</option>
+                <option value="Emergency Fund">🚨 Emergency Fund</option>
+                <option value="Other">📦 Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Frequency</label>
+              <select id="bill-frequency" class="form-select" required>
+                <option value="monthly">📅 Monthly</option>
+                <option value="quarterly">📊 Quarterly</option>
+                <option value="yearly">📆 Yearly</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Day of Month</label>
+              <input type="number" id="bill-day" class="form-input" min="1" max="31" placeholder="1-31" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reminder Days</label>
+              <input type="number" id="reminder-days" class="form-input" min="1" max="10" placeholder="3" value="3" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-modern btn-primary" onclick="event.preventDefault(); submitRecurringExpenseForm();">
+            <i class="fas fa-repeat"></i>
+            Add Recurring Expense
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Add Income Section -->
+    <section id="income-form" class="form-section slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-money-bill-wave"></i>
+        Add Income
+      </h2>
+      <form id="income-form-element">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Income Source</label>
+            <input type="text" id="income-source" class="form-input" placeholder="e.g., Salary, Freelance" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount (₹)</label>
+            <input type="number" id="income-amount" class="form-input" placeholder="0.00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="income-category" class="form-select" required>
+              <option value="salary">💼 Salary</option>
+              <option value="freelance">💻 Freelance</option>
+              <option value="business">🏢 Business</option>
+              <option value="investment">📈 Investment</option>
+              <option value="rental">🏠 Rental</option>
+              <option value="bonus">🎁 Bonus</option>
+              <option value="gift">🎉 Gift</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Frequency</label>
+            <select id="income-frequency" class="form-select">
+              <option value="one-time">🔄 One-time</option>
+              <option value="weekly">📅 Weekly</option>
+              <option value="bi-weekly">📊 Bi-weekly</option>
+              <option value="monthly">📆 Monthly</option>
+              <option value="quarterly">📈 Quarterly</option>
+              <option value="yearly">📋 Yearly</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="income-date" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="income-description" class="form-input" placeholder="Description (optional)" rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-modern btn-primary" onclick="event.preventDefault(); submitIncomeForm();">
+          <i class="fas fa-plus"></i>
+          Add Income
+        </button>
+      </form>
+    </section>
+
+    <!-- Add Goal Section -->
+    <section id="goal-form" class="form-section slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-bullseye"></i>
+        Add Financial Goal
+      </h2>
+      <form id="goal-form-element">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Goal Name</label>
+            <input type="text" id="goal-name" class="form-input" placeholder="e.g., Emergency Fund, Vacation" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Amount (₹)</label>
+            <input type="number" id="goal-target-amount" class="form-input" placeholder="0.00" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Current Amount (₹)</label>
+            <input type="number" id="goal-current-amount" class="form-input" placeholder="0.00" value="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Target Date</label>
+            <input type="date" id="goal-target-date" class="form-input" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <select id="goal-category" class="form-select" required>
+              <option value="emergency-fund">🚨 Emergency Fund</option>
+              <option value="vacation">🏖️ Vacation</option>
+              <option value="house">🏠 House</option>
+              <option value="car">🚗 Car</option>
+              <option value="education">🎓 Education</option>
+              <option value="retirement">👴 Retirement</option>
+              <option value="investment">📈 Investment</option>
+              <option value="other">📦 Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea id="goal-description" class="form-input" placeholder="Description (optional)" rows="2"></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn-modern btn-primary" onclick="event.preventDefault(); submitGoalForm();">
+          <i class="fas fa-bullseye"></i>
+          Add Goal
+        </button>
+      </form>
+    </section>
+
+    <!-- Filters Section -->
+    <section class="filters slide-up">
+      <input type="text" id="search-box" class="form-input" placeholder="🔍 Search expense..." />
+      <select id="month-filter" class="form-select">
+        <option value="">📅 All Months</option>
+      </select>
+    </section>
+
+    <!-- Charts Section -->
+    <section class="chart-container slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-chart-pie"></i>
+        Expense Analytics
+      </h2>
+      <div class="dashboard-grid">
+        <div class="chart-wrapper">
+          <canvas id="expense-chart"></canvas>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="monthly-trend-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Financial Goals Section -->
+    <section id="goals-section" class="goals-section slide-up">
+      <div class="section-header">
+        <h2><i class="fas fa-bullseye"></i> Financial Goals</h2>
+        <button type="button" onclick="smoothScrollTo('goal-form')" class="btn-modern btn-primary">
+          <i class="fas fa-plus"></i>
+          Add Goal
+        </button>
+      </div>
+      <div id="goals-dashboard">
+        <div class="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          Loading goals...
+        </div>
+      </div>
+    </section>
+
+    <!-- Cash Flow Section -->
+    <section id="cash-flow-section" class="form-section slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        Cash Flow Analysis
+      </h2>
+      <div class="cash-flow-grid">
+        <div class="cash-flow-card">
+          <h3><i class="fas fa-arrow-up"></i> Income Summary</h3>
+          <div id="income-summary">
+            <div class="summary-item">
+              <span class="summary-label">Total Income:</span>
+              <span class="summary-value" id="total-income">₹0</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Monthly Average:</span>
+              <span class="summary-value" id="avg-income">₹0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cash-flow-card">
+          <h3><i class="fas fa-exchange-alt"></i> Cash Flow</h3>
+          <div id="cash-flow-summary">
+            <div class="summary-item">
+              <span class="summary-label">Net Cash Flow:</span>
+              <span class="summary-value" id="net-cash-flow">₹0</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Savings Rate:</span>
+              <span class="summary-value" id="savings-rate">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cash-flow-card">
+          <h3><i class="fas fa-shield-alt"></i> Emergency Fund</h3>
+          <div id="financial-goals">
+            <div class="summary-item">
+              <span class="summary-label">Emergency Fund:</span>
+              <span class="summary-value" id="emergency-fund">₹0</span>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">Target: 6 months expenses</span>
+              <span class="summary-value" id="emergency-target">₹0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports Section -->
+    <section id="reports-section" class="form-section slide-up">
+      <h2 class="section-title">
+        <i class="fas fa-chart-bar"></i>
+        Advanced Reports
+      </h2>
+      <div class="reports-grid">
+        <div class="report-card">
+          <h3><i class="fas fa-calendar-check"></i> Custom Date Range Report</h3>
+          <p>Generate detailed reports for any date range with comparative analysis</p>
+          <form id="custom-report-form" onsubmit="event.preventDefault(); generateCustomReport();">
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" id="report-start-date" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" id="report-end-date" class="form-input" required>
+              </div>
+            </div>
+            <label style="display: flex; align-items: center; gap: var(--space-2); margin: var(--space-4) 0;">
+              <input type="checkbox" id="include-comparison">
+              Include comparison with previous period
+            </label>
+            <button type="submit" class="btn-modern btn-primary">
+              <i class="fas fa-chart-line"></i>
+              Generate Report
+            </button>
+          </form>
+        </div>
+
+        <div class="report-card">
+          <h3><i class="fas fa-chart-area"></i> Monthly Comparison</h3>
+          <p>Compare spending patterns across multiple months</p>
+          <form id="monthly-comparison-form" onsubmit="event.preventDefault(); generateMonthlyComparison();">
+            <div class="form-group">
+              <label class="form-label">Time Period</label>
+              <select id="comparison-months" class="form-select">
+                <option value="3">Last 3 months</option>
+                <option value="6" selected>Last 6 months</option>
+                <option value="12">Last 12 months</option>
+                <option value="24">Last 24 months</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-modern btn-primary">
+              <i class="fas fa-chart-bar"></i>
+              Generate Comparison
+            </button>
+          </form>
+        </div>
+
+        <div class="report-card">
+          <h3><i class="fas fa-tags"></i> Category Analysis</h3>
+          <p>Deep dive into spending patterns by category</p>
+          <form id="category-analysis-form" onsubmit="event.preventDefault(); generateCategoryAnalysis();">
+            <div class="form-group">
+              <label class="form-label">Analysis Type</label>
+              <select id="analysis-type" class="form-select">
+                <option value="spending-trends">Spending Trends</option>
+                <option value="budget-variance">Budget Variance</option>
+                <option value="category-comparison">Category Comparison</option>
+                <option value="seasonal-patterns">Seasonal Patterns</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-modern btn-primary">
+              <i class="fas fa-search"></i>
+              Analyze Categories
+            </button>
+          </form>
+        </div>
+
+        <div class="report-card">
+          <h3><i class="fas fa-file-export"></i> Export Options</h3>
+          <p>Export your financial data in various formats</p>
+          <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+            <button type="button" onclick="exportToCSV()" class="btn-modern btn-secondary">
+              <i class="fas fa-file-csv"></i>
+              Export to CSV
+            </button>
+            <button type="button" onclick="exportToPDF()" class="btn-modern btn-secondary">
+              <i class="fas fa-file-pdf"></i>
+              Export to PDF
+            </button>
+            <button type="button" onclick="exportChartAsImage('expense-chart', 'expense-chart.png')" class="btn-modern btn-secondary">
+              <i class="fas fa-image"></i>
+              Export Charts
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Floating Navigation -->
+  <nav class="floating-nav">
+    <button class="nav-item active" onclick="smoothScrollTo('insights-dashboard')" title="Dashboard">
+      <i class="fas fa-chart-pie"></i>
+    </button>
+    <button class="nav-item" onclick="smoothScrollTo('expense-form')" title="Add Expense">
+      <i class="fas fa-plus"></i>
+    </button>
+    <button class="nav-item" onclick="smoothScrollTo('income-form')" title="Add Income">
+      <i class="fas fa-dollar-sign"></i>
+    </button>
+    <button class="nav-item" onclick="smoothScrollTo('goal-form')" title="Add Goal">
+      <i class="fas fa-bullseye"></i>
+    </button>
+    <button class="nav-item" onclick="smoothScrollTo('reports-section')" title="Reports">
+      <i class="fas fa-chart-bar"></i>
+    </button>
+    <button class="nav-item" onclick="smoothScrollTo('cash-flow-section')" title="Cash Flow">
+      <i class="fas fa-exchange-alt"></i>
+    </button>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="auth.js"></script>
+  <script src="script.js"></script>
+  
+  <script>
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      try { if (typeof loadAnalytics === 'function') { loadAnalytics(); } } catch (e) {}
+      try {
+        const storedUser = localStorage.getItem('user');
+        const parsedUser = storedUser ? JSON.parse(storedUser) : null;
+        if (window.categoryService && !window.categoryService.initialized) { window.categoryService.initialize(); }
+        if (window.goalService && typeof window.goalService.renderGoalsDashboard === 'function') { window.goalService.renderGoalsDashboard(); }
+        if (window.notificationService && parsedUser?.id) { window.notificationService.init(parsedUser.id); }
+      } catch (e) {}
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('fade-in');
+          }
+        });
+      });
+      document.querySelectorAll('.slide-up').forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>
