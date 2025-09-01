@@ -2,7 +2,7 @@
   "name": "personal-finance-hub",
   "version": "1.0.0",
   "description": "Personal Finance Management Application",
-  "main": "index.js",
+  "main": "server.js",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
