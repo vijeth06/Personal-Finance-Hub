@@ -121,13 +121,10 @@ app.get(["/", "/login", "/signup"], (req, res, next) => {
   res.sendFile(path.join(__dirname, file));
 });
 
-// Catch-all handler for undefined routes
 app.get('*', (req, res) => {
-  // If it's an API request, return JSON error
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
-  // For all other requests, serve the main app
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
